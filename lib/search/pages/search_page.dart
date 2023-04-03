@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/helper/icon_helper.dart';
 import 'package:flutter_application_1/search/model/search_results.dart';
 import 'package:flutter_application_1/service/current_location_service.dart';
 
@@ -61,13 +62,22 @@ class _SearchPageState extends State<SearchPage> {
           ),
           Expanded(
             child: searchResults.isEmpty
-                ? const Center(
-                    child: Text('Minimum 3 letters required to search', style: TextStyle(fontFamily: 'Poppins')),
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        WeatherImage.resolveImage('search.png', height: 80),
+                        const Text('Minimum 3 letters required to search',
+                            style: TextStyle(fontFamily: 'Poppins')),
+                      ],
+                    ),
                   )
                 : ListView.separated(
                     itemBuilder: (context, index) => ListTile(
-                          contentPadding: const EdgeInsets.fromLTRB(32, 0, 8, 0),
-                          onTap: () => Navigator.of(context).pop(searchResults[index]),
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(32, 0, 8, 0),
+                          onTap: () =>
+                              Navigator.of(context).pop(searchResults[index]),
                           title: Text(
                             searchResults[index].name ?? 'Loading...',
                             style: const TextStyle(fontFamily: 'Poppins'),

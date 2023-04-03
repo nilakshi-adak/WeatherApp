@@ -25,7 +25,6 @@ Widget loadingView(BuildContext context) {
           ),
           cardLineView(context, 55),
           cardLineView(context, 55),
-          cardLineView(context, 55),
         ],
       ),
     ),
@@ -40,7 +39,8 @@ Widget cardLineView(BuildContext context, double height) {
   return Card(
     elevation: 3,
     child: Container(
-      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20))),
       height: height,
       width: MediaQuery.of(context).size.width * 0.92,
     ),
