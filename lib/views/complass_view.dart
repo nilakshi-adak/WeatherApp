@@ -13,7 +13,7 @@ Widget compassView(String angle) {
             padding: const EdgeInsets.all(30.0),
             child: Transform.rotate(
               angle: double.parse(angle),
-              child: SizedBox(height: 60, width: 60, child: WeatherImage.resolveImage('up-arrow.png')),
+              child: SizedBox(height: 55, width: 55, child: WeatherImage.resolveImage('up-arrow.png')),
             )),
       ],
     ),

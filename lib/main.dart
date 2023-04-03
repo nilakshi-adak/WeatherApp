@@ -1,12 +1,22 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/geo_location/geolocation.dart';
 import 'package:flutter_application_1/model/current.dart';
+import 'package:flutter_application_1/search/model/search_results.dart';
+import 'package:flutter_application_1/search/pages/search_page.dart';
 import 'package:flutter_application_1/views/card_forecast.dart';
 import 'package:flutter_application_1/views/card_main.dart';
 import 'package:flutter_application_1/views/card_row.dart';
+import 'package:flutter_application_1/views/loading_view.dart';
+import 'package:flutter_application_1/views/network_broken.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'service/current_location_service.dart';
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const MyApp());
 }
 
@@ -28,7 +38,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({super.key, required this.title});
 
   final String title;
-  final currentlocationservice = CurrentLocationService();
+  final currentlocationservice = WeatherService();
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -37,68 +47,137 @@ class MyHomePage extends StatefulWidget {
 CurrentLocation? location;
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool showNetworkBroken = false;
   @override
   void initState() {
     super.initState();
-    widget.currentlocationservice.getForecastData().then((value) {
-      location = value;
-      setState(() {});
+    FlutterNativeSplash.remove();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.mobile ||
+          result == ConnectivityResult.wifi) {
+        showNetworkBroken = false;
+        setState(() {});
+        _updateData();
+      }
     });
+    _updateData();
+  }
+
+  void _updateData() {
+    Connectivity().checkConnectivity().then((connectivityResult) {
+      if (connectivityResult == ConnectivityResult.mobile ||
+          connectivityResult == ConnectivityResult.wifi) {
+        GeoLocation().getCurrentPosition().then((value) {
+          if (value is String) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(value)));
+          } else if (value is Position) {
+            widget.currentlocationservice
+                .getForecastData(value.latitude, value.longitude)
+                .then((value) {
+              location = value;
+              showNetworkBroken = false;
+              setState(() {});
+            });
+          }
+        });
+      } else {
+        showNetworkBroken = true;
+        setState(() {});
+      }
+    });
+  }
+
+  Future<void> _showSearchView(BuildContext context) async {
+    final searchResult = await showModalBottomSheet(
+      context: context,
+      builder: (context) => const SearchPage(),
+      enableDrag: true,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+    );
+    if (searchResult is SearchResult) {
+      widget.currentlocationservice
+          .getForecastData(
+              searchResult.lat ?? 22.5726, searchResult.lon ?? 88.3639)
+          .then((value) {
+        location = value;
+        setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: location == null
-          ? Container()
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 32),
-                child: Column(
-                  children: [
-                    cardMain(location!),
-                    cardRow(
-                      context,
-                      'UV Index',
-                      'Humidity',
-                      location!.current?.uv.toString() ?? 'loading..',
-                      location!.current?.humidity.toString() ?? 'loading..',
-                      'uv.png',
-                      'humidity.png',
-                      null,
-                      '%',
-                      false,
+      body: showNetworkBroken
+          ? networkBrokenView(context)
+          : location == null
+              ? loadingView(context)
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 32),
+                    child: Column(
+                      children: [
+                        cardMain(location!),
+                        cardRow(
+                          context,
+                          'UV Index',
+                          'Humidity',
+                          location!.current?.uv.toString() ?? 'loading..',
+                          location!.current?.humidity.toString() ?? 'loading..',
+                          'uv.png',
+                          'humidity.png',
+                          null,
+                          '%',
+                          false,
+                        ),
+                        cardRow(
+                          context,
+                          'Wind',
+                          'Visibility',
+                          location!.current?.windKph.toString() ?? 'loading..',
+                          location!.current?.visKm.toString() ?? 'loading..',
+                          'wind.png',
+                          'visibility.png',
+                          'kmph',
+                          'km',
+                          false,
+                        ),
+                        cardRow(
+                          context,
+                          '',
+                          'Precipitation',
+                          location!.current?.windDegree.toString() ??
+                              'loading..',
+                          location!.current?.precipMm.toString() ?? 'loading..',
+                          '',
+                          'precipitation.png',
+                          null,
+                          'mm',
+                          true,
+                        ),
+                        forecast(context, location?.forecast),
+                      ],
                     ),
-                    cardRow(
-                      context,
-                      'Wind',
-                      'Visibility',
-                      location!.current?.windKph.toString() ?? 'loading..',
-                      location!.current?.visKm.toString() ?? 'loading..',
-                      'wind.png',
-                      'visibility.png',
-                      'kmph',
-                      'km',
-                      false,
-                    ),
-                    cardRow(
-                      context,
-                      '',
-                      'Precipitation',
-                      location!.current?.windDegree.toString() ?? 'loading..',
-                      location!.current?.precipMm.toString() ?? 'loading..',
-                      '',
-                      'precipitation.png',
-                      null,
-                      'mm',
-                      true,
-                    ),
-                    forecast(context, location?.forecast),
-                  ],
+                  ),
                 ),
-              ),
+      floatingActionButton: location == null
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _showSearchView(context),
+              child: const Icon(Icons.search),
             ),
-      floatingActionButton: FloatingActionButton(onPressed: () {}, child: const Icon(Icons.search)),
     );
   }
 }
