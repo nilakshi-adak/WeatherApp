@@ -1,7 +1,7 @@
 # WeatherApp
 
-An weather application using https://www.weatherapi.com/
+An weather application 
+API Credit : https://www.weatherapi.com/
 
-
-https://user-images.githubusercontent.com/90066731/231660438-3edd65b8-40e5-445c-9063-efab5c089a4b.mp4
+https://user-images.githubusercontent.com/90066731/231664799-704cf3e4-2019-4a98-8672-2d71eb3f493e.mp4
 
