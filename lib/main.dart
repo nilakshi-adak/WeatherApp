@@ -124,51 +124,62 @@ class _MyHomePageState extends State<MyHomePage> {
           ? networkBrokenView(context)
           : location == null
               ? loadingView(context)
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 32),
-                    child: Column(
-                      children: [
-                        cardMain(location!),
-                        cardRow(
-                          context,
-                          'UV Index',
-                          'Humidity',
-                          location!.current?.uv.toString() ?? 'loading..',
-                          location!.current?.humidity.toString() ?? 'loading..',
-                          'uv.png',
-                          'humidity.png',
-                          null,
-                          '%',
-                          false,
-                        ),
-                        cardRow(
-                          context,
-                          'Wind',
-                          'Visibility',
-                          location!.current?.windKph.toString() ?? 'loading..',
-                          location!.current?.visKm.toString() ?? 'loading..',
-                          'wind.png',
-                          'visibility.png',
-                          'kmph',
-                          'km',
-                          false,
-                        ),
-                        cardRow(
-                          context,
-                          '',
-                          'Precipitation',
-                          location!.current?.windDegree.toString() ??
-                              'loading..',
-                          location!.current?.precipMm.toString() ?? 'loading..',
-                          '',
-                          'precipitation.png',
-                          null,
-                          'mm',
-                          true,
-                        ),
-                        forecast(context, location?.forecast),
-                      ],
+              : Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/wallpapersky.png"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 32),
+                      child: Column(
+                        children: [
+                          cardMain(location!),
+                          cardRow(
+                            context,
+                            'UV Index',
+                            'Humidity',
+                            location!.current?.uv.toString() ?? 'loading..',
+                            location!.current?.humidity.toString() ??
+                                'loading..',
+                            'uv.png',
+                            'humidity.png',
+                            null,
+                            '%',
+                            false,
+                          ),
+                          cardRow(
+                            context,
+                            'Wind',
+                            'Visibility',
+                            location!.current?.windKph.toString() ??
+                                'loading..',
+                            location!.current?.visKm.toString() ?? 'loading..',
+                            'wind.png',
+                            'visibility.png',
+                            'kmph',
+                            'km',
+                            false,
+                          ),
+                          cardRow(
+                            context,
+                            '',
+                            'Precipitation',
+                            location!.current?.windDegree.toString() ??
+                                'loading..',
+                            location!.current?.precipMm.toString() ??
+                                'loading..',
+                            '',
+                            'precipitation.png',
+                            null,
+                            'mm',
+                            true,
+                          ),
+                          forecast(context, location?.forecast),
+                        ],
+                      ),
                     ),
                   ),
                 ),
