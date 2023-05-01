@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/images/direction.png
     - assets/images/wallpapersky.png
+    - assets/images/wallpaperskyy.png
     - assets/images/search.png
     - assets/images/humidity.png
     - assets/images/precipitation.png
@@ -80,6 +81,7 @@ flutter:
     - assets/images/visibility.png
     - assets/images/wind.png
     - assets/images/sunrise.png
+    - assets/images/sunrisee.png
     - assets/images/sunset.png
     - assets/images/no-internet.png
     - assets/images/day/113.png
