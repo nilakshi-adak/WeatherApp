@@ -39,7 +39,7 @@ dependencies:
   flutter_native_splash: ^2.2.6
   geolocator: ^9.0.2
   shimmer: ^2.0.0
-  connectivity_plus: ^3.0.3
+  connectivity_plus: ^5.0.2
 
 dev_dependencies:
   flutter_test:

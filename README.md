@@ -1,4 +1,4 @@
-# WeatherApp
+# flutter_application_1
 
 An weather application 
 API Credit : https://www.weatherapi.com/

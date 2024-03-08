@@ -38,7 +38,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({super.key, required this.title});
 
   final String title;
-  final currentlocationservice = WeatherService();
+  final currentLocationService = WeatherService();
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(value)));
           } else if (value is Position) {
-            widget.currentlocationservice
+            widget.currentLocationService
                 .getForecastData(value.latitude, value.longitude)
                 .then((value) {
               location = value;
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
       clipBehavior: Clip.antiAliasWithSaveLayer,
     );
     if (searchResult is SearchResult) {
-      widget.currentlocationservice
+      widget.currentLocationService
           .getForecastData(
               searchResult.lat ?? 22.5726, searchResult.lon ?? 88.3639)
           .then((value) {
