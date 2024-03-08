@@ -91,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showUserConsentDialog(BuildContext context) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
