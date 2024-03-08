@@ -9,7 +9,8 @@ Widget networkBrokenView(BuildContext context) {
         WeatherImage.resolveImage('no-internet.png', height: 110),
         const Padding(
           padding: EdgeInsets.only(top: 20),
-          child: Text('Please connect wifi or internet', style: TextStyle(fontFamily: 'Poppins')),
+          child: Text('Please connect wifi or internet',
+              style: TextStyle(fontFamily: 'Poppins')),
         ),
       ],
     ),

@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/constant/constant.dart';
 import 'package:flutter_application_1/geo_location/geolocation.dart';
 import 'package:flutter_application_1/model/current.dart';
 import 'package:flutter_application_1/search/model/search_results.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_application_1/views/loading_view.dart';
 import 'package:flutter_application_1/views/network_broken.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'service/current_location_service.dart';
 
@@ -48,76 +50,84 @@ CurrentLocation? location;
 
 class _MyHomePageState extends State<MyHomePage> {
   bool showNetworkBroken = false;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   void initState() {
     super.initState();
     FlutterNativeSplash.remove();
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      if (result == ConnectivityResult.mobile ||
-          result == ConnectivityResult.wifi) {
-        showNetworkBroken = false;
-        setState(() {});
-        _updateData();
-      }
-    });
     _updateData();
   }
 
   void _updateData() {
-    Connectivity().checkConnectivity().then((connectivityResult) {
+    Connectivity().checkConnectivity().then((connectivityResult) async {
       if (connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Location access required'),
-              content: const Text(
-                  'Your current location needs to be accessed to show your local weather info'),
-              actions: [
-                TextButton(
-                  child: const Text("Allow"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                    GeoLocation().getCurrentPosition().then((value) {
-                      if (value is String) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text(value)));
-                      } else if (value is Position) {
-                        _getLocalWeatherInfo(value);
-                      }
-                    });
-                  },
-                ),
-                TextButton(
-                  child: const Text("Deny"),
-                  onPressed: () {
-                    _getLocalWeatherInfo(Position(
-                      longitude: 73.8996092,
-                      latitude: 18.4322299,
-                      timestamp: DateTime.now(),
-                      accuracy: 0.0,
-                      altitude: 0.0,
-                      altitudeAccuracy: 0.0,
-                      heading: 0.0,
-                      headingAccuracy: 0.0,
-                      speed: 0,
-                      speedAccuracy: 0,
-                    ));
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
+        showNetworkBroken = false;
+        _prefs.then((value) {
+          if (value.getBool(Constant.userConsent) ?? false) {
+            GeoLocation().getCurrentPosition().then((value) {
+              if (value is String) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(value),
+                  duration: const Duration(seconds: 8),
+                ));
+              } else if (value is Position) {
+                _prefs
+                    .then((value) => value.setBool(Constant.userConsent, true));
+                _getLocalWeatherInfo(value);
+              }
+            });
+          } else {
+            _showUserConsentDialog(context);
+          }
+        });
       } else {
         showNetworkBroken = true;
         setState(() {});
       }
     });
+  }
+
+  void _showUserConsentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(Constant.userConsentAlertDialogTitle),
+          content: Text(Constant.userConsentAlertDialogShortDesc),
+          actions: [
+            TextButton(
+              child: Text(Constant.allow),
+              onPressed: () {
+                Navigator.of(context).pop();
+                GeoLocation().getCurrentPosition().then((value) {
+                  if (value is String) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(value)));
+                  } else if (value is Position) {
+                    _prefs.then(
+                        (value) => value.setBool(Constant.userConsent, true));
+                    _getLocalWeatherInfo(value);
+                  }
+                });
+              },
+            ),
+            TextButton(
+              child: Text(Constant.deny),
+              onPressed: () {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(Constant.userConsentMessage),
+                  action: SnackBarAction(
+                      label: 'Sure', onPressed: () => _updateData()),
+                ));
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 
   void _getLocalWeatherInfo(Position value) {
