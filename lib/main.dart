@@ -67,24 +67,66 @@ class _MyHomePageState extends State<MyHomePage> {
     Connectivity().checkConnectivity().then((connectivityResult) {
       if (connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
-        GeoLocation().getCurrentPosition().then((value) {
-          if (value is String) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(value)));
-          } else if (value is Position) {
-            widget.currentLocationService
-                .getForecastData(value.latitude, value.longitude)
-                .then((value) {
-              location = value;
-              showNetworkBroken = false;
-              setState(() {});
-            });
-          }
-        });
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Location access required'),
+              content: const Text(
+                  'Your current location needs to be accessed to show your local weather info'),
+              actions: [
+                TextButton(
+                  child: const Text("Allow"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    GeoLocation().getCurrentPosition().then((value) {
+                      if (value is String) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text(value)));
+                      } else if (value is Position) {
+                        _getLocalWeatherInfo(value);
+                      }
+                    });
+                  },
+                ),
+                TextButton(
+                  child: const Text("Deny"),
+                  onPressed: () {
+                    _getLocalWeatherInfo(Position(
+                      longitude: 73.8996092,
+                      latitude: 18.4322299,
+                      timestamp: DateTime.now(),
+                      accuracy: 0.0,
+                      altitude: 0.0,
+                      altitudeAccuracy: 0.0,
+                      heading: 0.0,
+                      headingAccuracy: 0.0,
+                      speed: 0,
+                      speedAccuracy: 0,
+                    ));
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },
+        );
       } else {
         showNetworkBroken = true;
         setState(() {});
       }
+    });
+  }
+
+  void _getLocalWeatherInfo(Position value) {
+    widget.currentLocationService
+        .getForecastData(value.latitude, value.longitude)
+        .then((value) {
+      location = value;
+      showNetworkBroken = false;
+      setState(() {});
     });
   }
 
