@@ -7,5 +7,7 @@ class Constant {
   static String userConsentAlertDialogTitle = 'Location access required';
   static String userConsentAlertDialogShortDesc = 'Your current location needs to be accessed to show your local weather info';
   static String userConsent = 'doesUserAllowedLocation';
-  static String userConsentMessage = 'Oops! we are sorry to show your local weather information. Do you want to allow your current location?';
+  static String locationAllowed = 'locationAllowed';
+  static String locationDenied = 'locationDenied';
+  static String userConsentMessage = "Apologies, but we are unable to access your location to provide local weather information at the moment. Please feel free to explore other features of the app.";
 }

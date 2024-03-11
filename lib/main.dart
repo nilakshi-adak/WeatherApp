@@ -65,7 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
           connectivityResult == ConnectivityResult.wifi) {
         showNetworkBroken = false;
         _prefs.then((value) {
-          if (value.getBool(Constant.userConsent) ?? false) {
+          if ((value.getString(Constant.userConsent) ?? '').isEmpty ||
+              (value.getString(Constant.userConsent) ==
+                  Constant.locationAllowed)) {
             GeoLocation().getCurrentPosition().then((value) {
               if (value is String) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -78,8 +80,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 _getLocalWeatherInfo(value);
               }
             });
-          } else {
-            _showUserConsentDialog(context);
+          } else if ((value.getString(Constant.userConsent) ==
+              Constant.locationDenied)) {
+            _getLocalWeatherInfo(
+              Position(
+                longitude: 28.7041,
+                latitude: 77.1025,
+                timestamp: DateTime.now(),
+                accuracy: 0.0,
+                altitude: 0,
+                altitudeAccuracy: 0,
+                heading: 0,
+                headingAccuracy: 0,
+                speed: 0,
+                speedAccuracy: 0,
+              ),
+            );
           }
         });
       } else {
@@ -107,8 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text(value)));
                   } else if (value is Position) {
-                    _prefs.then(
-                        (value) => value.setBool(Constant.userConsent, true));
+                    _prefs.then((value) => value.setString(
+                        Constant.userConsent, Constant.locationAllowed));
                     _getLocalWeatherInfo(value);
                   }
                 });
@@ -118,11 +134,12 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(Constant.deny),
               onPressed: () {
                 Navigator.of(context).pop();
+                _prefs.then((value) => value.setString(
+                    Constant.userConsent, Constant.locationDenied));
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(Constant.userConsentMessage),
-                  action: SnackBarAction(
-                      label: 'Sure', onPressed: () => _updateData()),
                 ));
+                _updateData();
               },
             )
           ],
