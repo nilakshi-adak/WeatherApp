@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/constant/constant.dart';
 import 'package:flutter_application_1/extension/strings.dart';
 import 'package:flutter_application_1/helper/icon_helper.dart';
 import 'package:flutter_application_1/model/current.dart';
 
-Widget cardMain(CurrentLocation location) {
+Widget cardMain(CurrentLocation location, String userConsent) {
   return Card(
     margin: const EdgeInsets.all(20),
     elevation: 3,
@@ -21,6 +22,9 @@ Widget cardMain(CurrentLocation location) {
               children: [
                 Text(location.location?.name ?? 'loading..', style: const TextStyle(fontFamily: 'Poppins')),
                 Text(location.location?.region ?? 'loading..', style: const TextStyle(fontFamily: 'Poppins')),
+                if (userConsent == StringConstant.locationDenied)
+                  Text(StringConstant.locationDisabledMessage,
+                      style: const TextStyle(fontFamily: 'Poppins', fontSize: 10)),
               ],
             ),
           ),

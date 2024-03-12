@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/constant/constant.dart';
 import 'package:flutter_application_1/geo_location/geolocation.dart';
 import 'package:flutter_application_1/model/current.dart';
+import 'package:flutter_application_1/search/model/position.dart';
 import 'package:flutter_application_1/search/model/search_results.dart';
 import 'package:flutter_application_1/search/pages/search_page.dart';
 import 'package:flutter_application_1/views/card_forecast.dart';
@@ -28,10 +29,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WeatherApp',
+      title: StringConstant.appTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.amber),
-      home: MyHomePage(title: 'WeatherApp'),
+      home: MyHomePage(title: StringConstant.appTitle),
     );
   }
 }
@@ -51,6 +52,7 @@ CurrentLocation? location;
 class _MyHomePageState extends State<MyHomePage> {
   bool showNetworkBroken = false;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  var userConsent = '';
 
   @override
   void initState() {
@@ -59,88 +61,71 @@ class _MyHomePageState extends State<MyHomePage> {
     _updateData();
   }
 
-  void _updateData() {
-    Connectivity().checkConnectivity().then((connectivityResult) async {
-      if (connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi) {
-        showNetworkBroken = false;
-        _prefs.then((value) {
-          if ((value.getString(Constant.userConsent) ?? '').isEmpty ||
-              (value.getString(Constant.userConsent) ==
-                  Constant.locationAllowed)) {
-            GeoLocation().getCurrentPosition().then((value) {
-              if (value is String) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(value),
-                  duration: const Duration(seconds: 8),
-                ));
-              } else if (value is Position) {
-                _prefs
-                    .then((value) => value.setBool(Constant.userConsent, true));
-                _getLocalWeatherInfo(value);
-              }
-            });
-          } else if ((value.getString(Constant.userConsent) ==
-              Constant.locationDenied)) {
-            _getLocalWeatherInfo(
-              Position(
-                longitude: 28.7041,
-                latitude: 77.1025,
-                timestamp: DateTime.now(),
-                accuracy: 0.0,
-                altitude: 0,
-                altitudeAccuracy: 0,
-                heading: 0,
-                headingAccuracy: 0,
-                speed: 0,
-                speedAccuracy: 0,
-              ),
-            );
-          }
-        });
-      } else {
-        showNetworkBroken = true;
-        setState(() {});
-      }
-    });
+  /// Check whether internet is available or not
+  Future<bool> _isNetworkAvailable() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi);
   }
 
-  void _showUserConsentDialog(BuildContext context) {
+  /// Update user consent locally
+  Future<void> _setUserPreference(String settings) async {
+    final pref = await _prefs;
+    pref.setString(StringConstant.userConsent, settings).then((value) => _updateData());
+  }
+
+  /// Return three cases - Accepted, Denied, Empty
+  Future<String> _getUserPreference() async {
+    final pref = await _prefs;
+    return pref.getString(StringConstant.userConsent) ?? '';
+  }
+
+  Future<Position> _getUsersLocation() async {
+    final location = await GeoLocation().getCurrentPosition();
+    return location;
+  }
+
+  /// Update data based on preference
+  void _updateData() async {
+    userConsent = await _getUserPreference();
+    switch (userConsent) {
+      case '':
+        _showUserConsentDialog();
+        break;
+      case StringConstant.locationAllowed:
+        _getWeatherData(await _getUsersLocation());
+        setState(() {});
+        break;
+      case StringConstant.locationDenied:
+        _getWeatherData(defaultPositionData());
+        setState(() {});
+        break;
+      default:
+    }
+  }
+
+  /// Based on users consent it will dismiss the dialog and set pref
+  Future<void> _popAndUpdateConsent(BuildContext context, String consent) async {
+    Navigator.of(context).pop();
+    _setUserPreference(consent);
+  }
+
+  /// Asks user consent to get user's location data
+  void _showUserConsentDialog() {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(Constant.userConsentAlertDialogTitle),
-          content: Text(Constant.userConsentAlertDialogShortDesc),
+          title: Text(StringConstant.userConsentAlertDialogTitle),
+          content: Text(StringConstant.userConsentAlertDialogShortDesc),
           actions: [
             TextButton(
-              child: Text(Constant.allow),
-              onPressed: () {
-                Navigator.of(context).pop();
-                GeoLocation().getCurrentPosition().then((value) {
-                  if (value is String) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(value)));
-                  } else if (value is Position) {
-                    _prefs.then((value) => value.setString(
-                        Constant.userConsent, Constant.locationAllowed));
-                    _getLocalWeatherInfo(value);
-                  }
-                });
-              },
+              child: Text(StringConstant.allow),
+              onPressed: () async => await _popAndUpdateConsent(context, StringConstant.locationAllowed),
             ),
             TextButton(
-              child: Text(Constant.deny),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _prefs.then((value) => value.setString(
-                    Constant.userConsent, Constant.locationDenied));
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(Constant.userConsentMessage),
-                ));
-                _updateData();
-              },
+              child: Text(StringConstant.deny),
+              onPressed: () async => await _popAndUpdateConsent(context, StringConstant.locationDenied),
             )
           ],
         );
@@ -148,17 +133,28 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _getLocalWeatherInfo(Position value) {
-    widget.currentLocationService
-        .getForecastData(value.latitude, value.longitude)
-        .then((value) {
-      location = value;
-      showNetworkBroken = false;
-      setState(() {});
-    });
+  /// Get server data based on Position provide
+  void _getWeatherData(Position position) {
+    showNetworkBroken = false;
+    _isNetworkAvailable().then(
+      (value) {
+        if (value) {
+          return widget.currentLocationService.getForecastData(position.latitude, position.longitude).then(
+            (value) {
+              location = value;
+              setState(() {});
+            },
+          );
+        } else {
+          showNetworkBroken = true;
+          setState(() {});
+        }
+      },
+    );
   }
 
-  Future<void> _showSearchView(BuildContext context) async {
+  /// Search modal appears
+  Future<void> _showSearchModal(BuildContext context) async {
     final searchResult = await showModalBottomSheet(
       context: context,
       builder: (context) => const SearchPage(),
@@ -166,21 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       clipBehavior: Clip.antiAliasWithSaveLayer,
     );
     if (searchResult is SearchResult) {
-      widget.currentLocationService
-          .getForecastData(
-              searchResult.lat ?? 22.5726, searchResult.lon ?? 88.3639)
-          .then((value) {
-        location = value;
-        setState(() {});
-      });
+      if (searchResult.lon != null && searchResult.lat != null) {
+        _getWeatherData(defaultPositionData(lon: searchResult.lon!, lat: searchResult.lat!));
+      }
     }
   }
+
+  void updateState() => setState(() => _updateData());
 
   @override
   void dispose() {
@@ -191,72 +183,60 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: showNetworkBroken
-          ? networkBrokenView(context)
+          ? networkBrokenView(context, updateState)
           : location == null
               ? loadingView(context)
-              : Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/wallpaperskyy.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 32),
-                      child: Column(
-                        children: [
-                          cardMain(location!),
-                          cardRow(
-                            context,
-                            'UV Index',
-                            'Humidity',
-                            location!.current?.uv.toString() ?? 'loading..',
-                            location!.current?.humidity.toString() ??
-                                'loading..',
-                            'uv.png',
-                            'humidity.png',
-                            null,
-                            '%',
-                            false,
-                          ),
-                          cardRow(
-                            context,
-                            'Wind',
-                            'Visibility',
-                            location!.current?.windKph.toString() ??
-                                'loading..',
-                            location!.current?.visKm.toString() ?? 'loading..',
-                            'wind.png',
-                            'visibility.png',
-                            'kmph',
-                            'km',
-                            false,
-                          ),
-                          cardRow(
-                            context,
-                            '',
-                            'Precipitation',
-                            location!.current?.windDegree.toString() ??
-                                'loading..',
-                            location!.current?.precipMm.toString() ??
-                                'loading..',
-                            '',
-                            'precipitation.png',
-                            null,
-                            'mm',
-                            true,
-                          ),
-                          forecast(context, location?.forecast),
-                        ],
-                      ),
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 32),
+                    child: Column(
+                      children: [
+                        cardMain(location!, userConsent),
+                        cardRow(
+                          context,
+                          StringConstant.uvIndex,
+                          StringConstant.humidity,
+                          location!.current?.uv.toString() ?? StringConstant.loading,
+                          location!.current?.humidity.toString() ?? StringConstant.loading,
+                          StringConstant.uvIcon,
+                          StringConstant.humidityIcon,
+                          null,
+                          StringConstant.percent,
+                          false,
+                        ),
+                        cardRow(
+                          context,
+                          StringConstant.wind,
+                          StringConstant.visibility,
+                          location!.current?.windKph.toString() ?? StringConstant.loading,
+                          location!.current?.visKm.toString() ?? StringConstant.loading,
+                          StringConstant.windIcon,
+                          StringConstant.visibilityIcon,
+                          StringConstant.kmph,
+                          StringConstant.km,
+                          false,
+                        ),
+                        cardRow(
+                          context,
+                          StringConstant.empty,
+                          StringConstant.precipitation,
+                          location!.current?.windDegree.toString() ?? StringConstant.loading,
+                          location!.current?.precipMm.toString() ?? StringConstant.loading,
+                          StringConstant.empty,
+                          StringConstant.precipitationIcon,
+                          null,
+                          StringConstant.mm,
+                          true,
+                        ),
+                        forecast(context, location?.forecast),
+                      ],
                     ),
                   ),
                 ),
       floatingActionButton: location == null
           ? null
           : FloatingActionButton(
-              onPressed: () => _showSearchView(context),
+              onPressed: () => _showSearchModal(context),
               child: const Icon(Icons.search),
             ),
     );
