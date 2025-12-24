@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/constant/constant.dart';
-import 'package:flutter_application_1/extension/strings.dart';
-import 'package:flutter_application_1/helper/icon_helper.dart';
-import 'package:flutter_application_1/model/current.dart';
+import 'package:weatherapp/constant/constant.dart';
+import 'package:weatherapp/extension/strings.dart';
+import 'package:weatherapp/helper/icon_helper.dart';
+import 'package:weatherapp/model/current.dart';
 
 Widget cardMain(CurrentLocation location, String userConsent) {
   return Card(

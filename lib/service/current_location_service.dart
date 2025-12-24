@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_application_1/constant/constant.dart';
-import 'package:flutter_application_1/model/current.dart';
-import 'package:flutter_application_1/search/model/search_results.dart';
+import 'package:weatherapp/constant/constant.dart';
+import 'package:weatherapp/model/current.dart';
+import 'package:weatherapp/search/model/search_results.dart';
 
 class WeatherService {
   Future<CurrentLocation> getForecastData(double lat, double long) async {

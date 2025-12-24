@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_application_1/views/card.dart';
-import 'package:flutter_application_1/views/card_skeleton.dart';
-import 'package:flutter_application_1/views/complass_view.dart';
+import 'package:weatherapp/views/card.dart';
+import 'package:weatherapp/views/card_skeleton.dart';
+import 'package:weatherapp/views/complass_view.dart';
 
 Widget cardRow(
   BuildContext context,

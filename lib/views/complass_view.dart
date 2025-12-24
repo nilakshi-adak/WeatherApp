@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/helper/icon_helper.dart';
+import 'package:weatherapp/helper/icon_helper.dart';
 
 Widget compassView(String angle) {
   return Center(

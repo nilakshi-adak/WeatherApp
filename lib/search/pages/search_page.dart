@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/helper/icon_helper.dart';
-import 'package:flutter_application_1/search/model/search_results.dart';
-import 'package:flutter_application_1/service/current_location_service.dart';
+import 'package:weatherapp/helper/icon_helper.dart';
+import 'package:weatherapp/search/model/search_results.dart';
+import 'package:weatherapp/service/current_location_service.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});

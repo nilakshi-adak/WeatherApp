@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/views/card.dart';
+import 'package:weatherapp/views/card.dart';
 import 'package:shimmer/shimmer.dart';
 
 Widget loadingView(BuildContext context) {

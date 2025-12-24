@@ -1,16 +1,16 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/constant/constant.dart';
-import 'package:flutter_application_1/geo_location/geolocation.dart';
-import 'package:flutter_application_1/model/current.dart';
-import 'package:flutter_application_1/search/model/position.dart';
-import 'package:flutter_application_1/search/model/search_results.dart';
-import 'package:flutter_application_1/search/pages/search_page.dart';
-import 'package:flutter_application_1/views/card_forecast.dart';
-import 'package:flutter_application_1/views/card_main.dart';
-import 'package:flutter_application_1/views/card_row.dart';
-import 'package:flutter_application_1/views/loading_view.dart';
-import 'package:flutter_application_1/views/network_broken.dart';
+import 'package:weatherapp/constant/constant.dart';
+import 'package:weatherapp/geo_location/geolocation.dart';
+import 'package:weatherapp/model/current.dart';
+import 'package:weatherapp/search/model/position.dart';
+import 'package:weatherapp/search/model/search_results.dart';
+import 'package:weatherapp/search/pages/search_page.dart';
+import 'package:weatherapp/views/card_forecast.dart';
+import 'package:weatherapp/views/card_main.dart';
+import 'package:weatherapp/views/card_row.dart';
+import 'package:weatherapp/views/loading_view.dart';
+import 'package:weatherapp/views/network_broken.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   /// Update data based on preference
-  void _updateData() async {
+  Future<void> _updateData() async {
     userConsent = await _getUserPreference();
     switch (userConsent) {
       case '':
@@ -172,7 +172,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void updateState() => setState(() => _updateData());
+  void updateState() async {
+    await _updateData();
+    setState(() {});
+  }
 
   @override
   void dispose() {
