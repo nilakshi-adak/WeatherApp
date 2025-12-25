@@ -6,43 +6,76 @@ Widget loadingView(BuildContext context) {
   return Shimmer.fromColors(
     baseColor: const Color.fromARGB(255, 211, 208, 208),
     highlightColor: Colors.white,
-    child: Padding(
-      padding: const EdgeInsets.only(top: 40),
-      child: Column(
-        children: [
-          cardLineView(context, 110),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [cardLoadingView(context), cardLoadingView(context)],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [cardLoadingView(context), cardLoadingView(context)],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [cardLoadingView(context), cardLoadingView(context)],
-          ),
-          cardLineView(context, 55),
-          cardLineView(context, 55),
-        ],
+    child: SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          children: [
+            cardLineView(context, 160),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: cardLoadingView(context)),
+                const SizedBox(width: 14),
+                Expanded(child: cardLoadingView(context)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(child: cardLoadingView(context)),
+                const SizedBox(width: 14),
+                Expanded(child: cardLoadingView(context)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(child: cardLoadingView(context)),
+                const SizedBox(width: 14),
+                Expanded(child: cardLoadingView(context)),
+              ],
+            ),
+            const SizedBox(height: 18),
+            cardLineView(context, 140),
+            const SizedBox(height: 80),
+          ],
+        ),
       ),
     ),
   );
 }
 
 Widget cardLoadingView(BuildContext context) {
-  return card(Container(), context);
+  return card(
+    SizedBox(
+      height: 120,
+      width: double.infinity,
+    ),
+    context,
+  );
 }
 
 Widget cardLineView(BuildContext context, double height) {
-  return Card(
-    elevation: 3,
-    child: Container(
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      height: height,
-      width: MediaQuery.of(context).size.width * 0.92,
+  final theme = Theme.of(context);
+  final surface = theme.colorScheme.surface.withValues(alpha: 0.98);
+
+  return Container(
+    decoration: BoxDecoration(
+      color: surface,
+      borderRadius: BorderRadius.circular(26),
+      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
+      boxShadow: [
+        BoxShadow(
+          color: theme.shadowColor.withValues(alpha: 0.08),
+          offset: const Offset(0, 12),
+          blurRadius: 24,
+          spreadRadius: -12,
+        ),
+      ],
     ),
+    height: height,
+    width: double.infinity,
   );
 }

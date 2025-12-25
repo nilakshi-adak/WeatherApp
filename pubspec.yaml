@@ -15,7 +15,7 @@ dependencies:
   flutter_native_splash: ^2.4.7
   geolocator: ^14.0.2
   shimmer: ^3.0.0
-  connectivity_plus: ^5.0.2
+  connectivity_plus: ^7.0.0
   shared_preferences: ^2.5.4
 
 dev_dependencies:
@@ -37,115 +37,9 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/direction.png
-    - assets/images/search.png
-    - assets/images/humidity.png
-    - assets/images/precipitation.png
-    - assets/images/rain.png
-    - assets/images/up-arrow.png
-    - assets/images/uv.png
-    - assets/images/visibility.png
-    - assets/images/wind.png
-    - assets/images/sunrise.png
-    - assets/images/sunrisee.png
-    - assets/images/sunset.png
-    - assets/images/no-internet.png
-    - assets/images/day/113.png
-    - assets/images/day/116.png
-    - assets/images/day/119.png
-    - assets/images/day/122.png
-    - assets/images/day/143.png
-    - assets/images/day/176.png
-    - assets/images/day/179.png
-    - assets/images/day/182.png
-    - assets/images/day/185.png
-    - assets/images/day/200.png
-    - assets/images/day/227.png
-    - assets/images/day/230.png
-    - assets/images/day/248.png
-    - assets/images/day/260.png
-    - assets/images/day/263.png
-    - assets/images/day/266.png
-    - assets/images/day/281.png
-    - assets/images/day/284.png
-    - assets/images/day/293.png
-    - assets/images/day/296.png
-    - assets/images/day/299.png
-    - assets/images/day/302.png
-    - assets/images/day/305.png
-    - assets/images/day/308.png
-    - assets/images/day/311.png
-    - assets/images/day/314.png
-    - assets/images/day/317.png
-    - assets/images/day/320.png
-    - assets/images/day/323.png
-    - assets/images/day/326.png
-    - assets/images/day/329.png
-    - assets/images/day/332.png
-    - assets/images/day/335.png
-    - assets/images/day/338.png
-    - assets/images/day/350.png
-    - assets/images/day/353.png
-    - assets/images/day/356.png
-    - assets/images/day/359.png
-    - assets/images/day/362.png
-    - assets/images/day/365.png
-    - assets/images/day/368.png
-    - assets/images/day/371.png
-    - assets/images/day/374.png
-    - assets/images/day/377.png
-    - assets/images/day/386.png
-    - assets/images/day/389.png
-    - assets/images/day/392.png
-    - assets/images/day/395.png
-    - assets/images/night/113.png
-    - assets/images/night/116.png
-    - assets/images/night/119.png
-    - assets/images/night/122.png
-    - assets/images/night/143.png
-    - assets/images/night/176.png
-    - assets/images/night/179.png
-    - assets/images/night/182.png
-    - assets/images/night/185.png
-    - assets/images/night/200.png
-    - assets/images/night/227.png
-    - assets/images/night/230.png
-    - assets/images/night/248.png
-    - assets/images/night/260.png
-    - assets/images/night/263.png
-    - assets/images/night/266.png
-    - assets/images/night/281.png
-    - assets/images/night/284.png
-    - assets/images/night/293.png
-    - assets/images/night/296.png
-    - assets/images/night/299.png
-    - assets/images/night/302.png
-    - assets/images/night/305.png
-    - assets/images/night/308.png
-    - assets/images/night/311.png
-    - assets/images/night/314.png
-    - assets/images/night/317.png
-    - assets/images/night/320.png
-    - assets/images/night/323.png
-    - assets/images/night/326.png
-    - assets/images/night/329.png
-    - assets/images/night/332.png
-    - assets/images/night/335.png
-    - assets/images/night/338.png
-    - assets/images/night/350.png
-    - assets/images/night/353.png
-    - assets/images/night/356.png
-    - assets/images/night/359.png
-    - assets/images/night/362.png
-    - assets/images/night/365.png
-    - assets/images/night/368.png
-    - assets/images/night/371.png
-    - assets/images/night/374.png
-    - assets/images/night/377.png
-    - assets/images/night/386.png
-    - assets/images/night/389.png
-    - assets/images/night/392.png
-    - assets/images/night/395.png
+    - assets/images/
+    - assets/images/day/
+    - assets/images/night/
 
   fonts:
     - family: Poppins
